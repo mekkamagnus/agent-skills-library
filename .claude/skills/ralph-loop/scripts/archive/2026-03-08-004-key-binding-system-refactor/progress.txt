@@ -1,0 +1,13 @@
+# Ralph Progress Log
+Started: Sun Mar  8 13:56:32 CST 2026
+Project: Functional Pattern Refactor
+---
+
+## Codebase Patterns
+- Use Option<T> from src/lib/fp/ for nullable values
+- Use Result<E, T> and AsyncResult<E, T> for error handling
+- Import from src/lib/fp/index.ts (facade API)
+- FP rules are warnings, not errors - gradual adoption
+- Tests use Vitest (NOT bun test) due to better-sqlite3 compatibility
+
+---

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Chore"
+  short_description: "Plan maintenance tasks and refactoring"
+  default_prompt: "Use $chore to plan this maintenance task"

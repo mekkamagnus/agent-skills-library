@@ -1,0 +1,63 @@
+{
+  "_comment": [
+    "Example PRD (Product Requirements Document) for Ralph agent",
+    "Copy this file to prd.json in the project root and customize for your project",
+    "",
+    "REQUIRED FIELDS:",
+    "- projectName: Name of your project",
+    "- branchName: Git branch for this Ralph session (e.g., 'ralph/001-feature-name')",
+    "- userStories: Array of user story objects (see structure below)",
+    "",
+    "USER STORY STRUCTURE:",
+    "- id: Unique identifier (e.g., 'US-001', 'US-002')",
+    "- title: Short descriptive title",
+    "- description: Detailed description of what needs to be done",
+    "- acceptanceCriteria: Array of strings defining done conditions",
+    "- priority: Integer (1=P0/critical, 10=P1/important, 20=P2/nice-to-have)",
+    "- passes: Boolean - Ralph sets to true when story is complete",
+    "- notes: Optional context or references to spec files"
+  ],
+  "projectName": "nerv-ts",
+  "branchName": "ralph/000-example-branch",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Example User Story",
+      "description": "Clear description of what needs to be implemented. Include context about why this feature is needed and what problem it solves.",
+      "acceptanceCriteria": [
+        "Specific, testable condition 1",
+        "Specific, testable condition 2",
+        "Specific, testable condition 3"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Optional: Reference to SPEC files, technical constraints, dependencies"
+    },
+    {
+      "id": "US-002",
+      "title": "Another Example Story",
+      "description": "Each user story should be independent and completable in one Ralph iteration.",
+      "acceptanceCriteria": [
+        "Feature works correctly",
+        "Tests pass",
+        "Documentation updated"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "P1 - High priority feature"
+    },
+    {
+      "_comment": "Priority levels:",
+      "P0": 1,
+      "P1": 10,
+      "P2": 20,
+      "_example": "Use priority to guide Ralph's selection order (lower number = higher priority)"
+    }
+  ],
+  "metadata": {
+    "_comment": "Optional metadata section for tracking",
+    "createdAt": "2026-01-26",
+    "updatedFor": "Example Ralph session",
+    "specType": "feature|chore|bugfix|refactor"
+  }
+}

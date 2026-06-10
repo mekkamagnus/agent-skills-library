@@ -1,0 +1,138 @@
+{
+  "projectName": "phraser",
+  "branchName": "ralph/006-email-auth-hardening",
+  "userStories": [
+    {
+      "id": "CHORE-006-1",
+      "title": "Add Regression Test for Session Cookie Consistency",
+      "description": "Create an automated test that verifies all files use the SESSION_COOKIE_NAME constant instead of hardcoded strings",
+      "acceptanceCriteria": [
+        "Test file tests/e2e/session-cookie-consistency.test.ts created",
+        "Test scans src/app/api/auth/ for hardcoded 'session' or 'phraser_session' strings",
+        "Test verifies all cookie references use the imported constant",
+        "Test fails if any file hardcodes the cookie name",
+        "Test passes with npx vitest run tests/e2e/session-cookie-consistency.test.ts"
+      ],
+      "priority": 100,
+      "passes": false,
+      "notes": "Phase 1: Quick Wins - prevents BUG-006 from recurring"
+    },
+    {
+      "id": "CHORE-006-2",
+      "title": "Add CI Check for Cookie Name Consistency",
+      "description": "Create a GitHub Actions workflow that runs the cookie consistency test on every PR",
+      "acceptanceCriteria": [
+        "Workflow file .github/workflows/check-cookie-consistency.yml created",
+        "Runs on pull_request events targeting main branch",
+        "Uses existing vitest test from CHORE-006-1",
+        "Fails the build if cookie name inconsistency detected",
+        "Runs in parallel with existing CI checks"
+      ],
+      "priority": 99,
+      "passes": false,
+      "notes": "Phase 1: Quick Wins - depends on CHORE-006-1"
+    },
+    {
+      "id": "CHORE-006-3",
+      "title": "Update Lessons Learned Document",
+      "description": "Add a new section to docs/lessons-from-adrs-2026-02-11.md documenting the email/auth bug cluster",
+      "acceptanceCriteria": [
+        "New section titled '10. HTTP APIs Over SMTP for Transactional Emails' added",
+        "Pattern, Evidence, Lesson, and Best Practice subsections included",
+        "References to BUG-004, BUG-005, BUG-006, and ADR-046 included",
+        "Code example showing lazy initialization pattern from resend-best-practices.md"
+      ],
+      "priority": 98,
+      "passes": false,
+      "notes": "Phase 2: Documentation - no code dependencies"
+    },
+    {
+      "id": "CHORE-006-4",
+      "title": "Document Rate Limiting Management",
+      "description": "Add a section to docs/resend-best-practices.md documenting how to manage rate limits during testing/development",
+      "acceptanceCriteria": [
+        "New section '## Rate Limiting Management' added to resend-best-practices.md",
+        "Documents the 3 codes per hour rate limit",
+        "Includes commands to check current rate limit status",
+        "Includes commands to clear rate limit (delete old temp passwords)",
+        "Documents when rate limiting resets"
+      ],
+      "priority": 97,
+      "passes": false,
+      "notes": "Phase 2: Documentation - no code dependencies"
+    },
+    {
+      "id": "CHORE-006-5",
+      "title": "Implement Option Combinators Pattern in AuthService",
+      "description": "Replace imperative if statements with functional Option/Result combinators across AuthService",
+      "acceptanceCriteria": [
+        "src/lib/fp/option.ts has filter, unwrapOrElse, orElse methods",
+        "src/lib/fp/result.ts has recoverWith, orElse methods for fallback chains",
+        "src/lib/services/auth-service.ts uses Option combinators instead of nested if statements",
+        "src/lib/auth.ts uses Option combinators for session cookie handling",
+        "All auth methods use pipe() for composition",
+        "Pattern documented in docs/fp-patterns.md as standard for codebase",
+        "Tests pass: npx vitest run tests/unit/auth-service.test.ts"
+      ],
+      "priority": 96,
+      "passes": false,
+      "notes": "Phase 3: FP Patterns Foundation - no dependencies"
+    },
+    {
+      "id": "CHORE-006-6",
+      "title": "Implement Error Visibility for Coding Agents",
+      "description": "Add structured error codes and documentation to make errors more discoverable and traceable for coding agents",
+      "acceptanceCriteria": [
+        "src/lib/fp/error-codes.ts created with typed error code registry",
+        "Error codes follow naming convention: {MODULE}_{NUMBER} (e.g., AUTH_001, DB_002)",
+        "src/lib/fp/errors.ts updated with code, cause, timestamp, and docs fields",
+        "docs/error-catalog.md created with error code documentation",
+        "Each error code documented with: kind, message, causes, fix, example code",
+        "AuthErrors typed factory object created in auth-service.ts",
+        "JSDoc @throws annotations added to public auth methods",
+        "Agent can search error code and find definition, docs, and all usages"
+      ],
+      "priority": 95,
+      "passes": false,
+      "notes": "Phase 4: Error System - depends on CHORE-006-5"
+    },
+    {
+      "id": "CHORE-006-7",
+      "title": "Unify Error Handling Systems",
+      "description": "Consolidate ErrorHandler, NetworkErrorHandler, and AppError into a single unified error handling system using the error codes from CHORE-006-6",
+      "acceptanceCriteria": [
+        "AppError interface extended with userMessage, retryable, cause fields",
+        "src/lib/app-error-handler.ts created as unified handler",
+        "Unified handler provides: logError(), toUserMessage(), toResponse(), fromUnknown()",
+        "src/lib/errorHandler.ts marked deprecated with JSDoc @deprecated",
+        "src/lib/networkErrorHandler.ts marked deprecated with JSDoc @deprecated",
+        "Client components updated to use AppErrorHandler instead of ErrorHandler",
+        "API routes use unified errorResponse() with error codes",
+        "All error logging uses structured JSON format with error codes",
+        "Tests pass: npx vitest run src/lib/__tests__/errorHandler.test.ts"
+      ],
+      "priority": 94,
+      "passes": false,
+      "notes": "Phase 4: Error System - depends on CHORE-006-5, CHORE-006-6"
+    },
+    {
+      "id": "CHORE-006-8",
+      "title": "Create E2E Production Login Test (Optional)",
+      "description": "Create a Playwright test that logs into production, waits for manual code input, and verifies successful redirect to translate page",
+      "acceptanceCriteria": [
+        "Test file tests/e2e/production-login.test.ts created",
+        "Test navigates to production login page",
+        "Test enters email address from environment variable",
+        "Test waits for user to provide the received code via stdin/prompt",
+        "Test enters the code and verifies redirect to /translate page",
+        "Test verifies session cookie is set correctly",
+        "Test uses Playwright's interactive pause or similar mechanism",
+        "Test marked with @manual or similar annotation for CI skip",
+        "Documentation in test file explains how to run manually"
+      ],
+      "priority": 50,
+      "passes": false,
+      "notes": "Phase 5: Optional - not required for chore completion"
+    }
+  ]
+}

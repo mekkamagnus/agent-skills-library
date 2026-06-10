@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature"
+  short_description: "Plan new features with acceptance criteria"
+  default_prompt: "Use $feature to plan a new feature"

@@ -1,0 +1,137 @@
+{
+  "projectName": "phraser",
+  "branchName": "chore/023-expo-mobile-app",
+  "userStories": [
+    {
+      "id": "CHORE-023-01",
+      "title": "Initialize Expo Project",
+      "description": "Create mobile/ directory with Expo SDK 52+, TypeScript strict mode, and Expo Router for file-based navigation",
+      "acceptanceCriteria": [
+        "mobile/ directory created with Expo SDK 52+",
+        "TypeScript configured with strict mode",
+        "App runs on iOS simulator/Android emulator",
+        "Expo Router configured for file-based navigation"
+      ],
+      "priority": 100,
+      "passes": false,
+      "notes": "Run: npx create-expo-app@latest mobile --template tabs-typescript, then clean up template files"
+    },
+    {
+      "id": "CHORE-023-02",
+      "title": "Configure ESLint with FP Rules",
+      "description": "Create eslint.config.mjs with FP rules, install eslint-plugin-fp and TypeScript ESLint packages",
+      "acceptanceCriteria": [
+        "eslint.config.mjs created with FP rules",
+        "eslint-plugin-fp installed and configured",
+        "TypeScript ESLint parser configured",
+        "bun run lint passes on initial files"
+      ],
+      "priority": 95,
+      "passes": false,
+      "notes": "Install: bun add -D eslint eslint-plugin-fp @typescript-eslint/parser @typescript-eslint/eslint-plugin"
+    },
+    {
+      "id": "CHORE-023-03",
+      "title": "Set Up NativeWind (Tailwind CSS)",
+      "description": "Install and configure NativeWind with Tailwind CSS, including design system colors",
+      "acceptanceCriteria": [
+        "NativeWind installed and configured",
+        "tailwind.config.js matches web design system colors (ink, paper, vermillion)",
+        "global.css with Tailwind directives created",
+        "nativewind-env.d.ts for TypeScript support created"
+      ],
+      "priority": 90,
+      "passes": false,
+      "notes": "Install: bun add nativewind tailwindcss, create tailwind.config.js with Phraser design tokens"
+    },
+    {
+      "id": "CHORE-023-04",
+      "title": "Copy FP Facade Module",
+      "description": "Copy lib/fp/ directory from web app to mobile/lib/fp/ with all FP utilities",
+      "acceptanceCriteria": [
+        "mobile/lib/fp/ directory created with all FP utilities",
+        "result.ts, option.ts, async-result.ts, pipe.ts copied",
+        "errors.ts and error-codes.ts copied",
+        "lib/fp/index.ts exports all modules",
+        "fp-ts installed as dependency"
+      ],
+      "priority": 85,
+      "passes": false,
+      "notes": "Copy files from src/lib/fp/ to mobile/lib/fp/, install: bun add fp-ts"
+    },
+    {
+      "id": "CHORE-023-05",
+      "title": "Configure Jest Testing",
+      "description": "Set up Jest with TypeScript support and React Native Testing Library",
+      "acceptanceCriteria": [
+        "Jest configured with TypeScript support",
+        "React Native Testing Library installed",
+        "jest.config.js created with jest-expo preset",
+        "jest.setup.ts with @testing-library/jest-native matchers",
+        "Test script in package.json"
+      ],
+      "priority": 80,
+      "passes": false,
+      "notes": "Install: bun add -D jest @testing-library/react-native @testing-library/jest-native jest-expo"
+    },
+    {
+      "id": "CHORE-023-06",
+      "title": "Write FP Module Tests",
+      "description": "Create tests for FP modules (result.test.ts, option.test.ts)",
+      "acceptanceCriteria": [
+        "mobile/lib/__tests__/result.test.ts created",
+        "mobile/lib/__tests__/option.test.ts created",
+        "Tests pass: bun run test",
+        "Tests cover Ok/Err variants, map, andThen, unwrap methods"
+      ],
+      "priority": 75,
+      "passes": false,
+      "notes": "Copy/adapt tests from src/lib/fp/__tests__/"
+    },
+    {
+      "id": "CHORE-023-07",
+      "title": "Create Base UI Components",
+      "description": "Create Button, Card, and ScreenLayout components with NativeWind styling",
+      "acceptanceCriteria": [
+        "Button component with NativeWind styling",
+        "Card component with ink/paper colors",
+        "ScreenLayout with safe area handling",
+        "Components exported from components/ui/index.ts"
+      ],
+      "priority": 70,
+      "passes": false,
+      "notes": "Create components/ui/Button.tsx, Card.tsx, and components/layout/ScreenLayout.tsx"
+    },
+    {
+      "id": "CHORE-023-08",
+      "title": "Create App Screens",
+      "description": "Create Expo Router screens: _layout.tsx, index.tsx, review.tsx, browse.tsx, settings.tsx",
+      "acceptanceCriteria": [
+        "app/_layout.tsx with root layout and navigation",
+        "app/index.tsx as home/translate placeholder",
+        "app/review.tsx as review placeholder",
+        "app/browse.tsx as browse placeholder",
+        "app/settings.tsx as settings placeholder",
+        "Tab navigation working between screens"
+      ],
+      "priority": 65,
+      "passes": false,
+      "notes": "Configure tabs in _layout.tsx, create placeholder screens with 'Coming Soon' text"
+    },
+    {
+      "id": "CHORE-023-09",
+      "title": "Add Scripts to Root Package.json",
+      "description": "Add convenience scripts for mobile app to root package.json",
+      "acceptanceCriteria": [
+        "mobile:start script added",
+        "mobile:ios script added",
+        "mobile:android script added",
+        "mobile:test script added",
+        "mobile:lint script added"
+      ],
+      "priority": 60,
+      "passes": false,
+      "notes": "Scripts: mobile:start, mobile:ios, mobile:android, mobile:test, mobile:lint"
+    }
+  ]
+}

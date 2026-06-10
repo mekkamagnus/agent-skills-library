@@ -1,0 +1,806 @@
+{
+  "_comment": [
+    "PRD (Product Requirements Document) for Ralph agent - tmax project",
+    "Converted from specs/prd.md on 2025-02-03"
+  ],
+  "projectName": "tmax",
+  "branchName": "ralph/004-key-binding-system-refactor",
+  "userStories": [
+    {
+      "id": "US-0.4.1",
+      "title": "T-Lisp Keymap Data Structures",
+      "description": "Expose keymap data structures to T-Lisp so that key bindings can be programmatically manipulated through T-Lisp code.",
+      "acceptanceCriteria": [
+        "keymap-get function returns nested alist structure when inspected",
+        "defkeymap my-mode-map creates a new keymap in T-Lisp",
+        "keymap-define-key adds binding to existing keymap",
+        "keymap-lookup returns command bound to key",
+        "Keymap objects have mode, parent, and bindings properties"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.4 - T-Lisp-Centric Key Binding System (25% complete)"
+    },
+    {
+      "id": "US-0.4.2",
+      "title": "Core Bindings in T-Lisp Files",
+      "description": "Move all default key bindings from TypeScript to T-Lisp files so they can be modified through T-Lisp. Create core/bindings/*.tlisp files for each mode.",
+      "acceptanceCriteria": [
+        "core/bindings/normal.tlisp exists and loads on startup",
+        "core/bindings/insert.tlisp exists and loads for insert mode",
+        "core/bindings/visual.tlisp exists and loads for visual mode",
+        "core/bindings/command.tlisp exists and loads for command mode",
+        "Modifying binding files and restarting tmax reflects changes",
+        "Binding files use defkeymap to create keymap structures",
+        "~/.tmaxrc custom bindings override defaults"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.4 - Critical for T-Lisp-first architecture"
+    },
+    {
+      "id": "US-0.4.3",
+      "title": "Pure T-Lisp Key Bind Function",
+      "description": "Implement pure T-Lisp key-bind function for programmatic key binding definition. Support key sequences, mode-specific bindings, and binding removal.",
+      "acceptanceCriteria": [
+        "(key-bind \"C-c C-c\" 'some-command) creates binding",
+        "(key-bind \"k\" 'kill-line \"normal\") creates mode-specific binding",
+        "(key-bind \"g d\" 'goto-definition) handles two-key sequences",
+        "(key-unbind \"C-c C-c\") removes binding",
+        "(key-bindings) lists all active bindings",
+        "(key-binding \"C-c C-c\") returns command and source info",
+        "Conflicting bindings override previous bindings",
+        "T-Lisp bindings execute when keys are pressed"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.4 - Core function for T-Lisp extensibility"
+    },
+    {
+      "id": "US-0.5.1",
+      "title": "Core Testing Framework MVP",
+      "description": "Implement basic testing framework for T-Lisp with deftest, test-run, and test-run-all functions. Support test execution, failure reporting, and summary statistics.",
+      "acceptanceCriteria": [
+        "(deftest my-test () (assert-true t)) defines and passes test",
+        "(test-run \"tests/my-file-test.tlisp\") executes tests in file",
+        "Test failures show failure message and line number",
+        "(test-run-all) executes all test files",
+        "Test summary shows passed, failed, and total counts",
+        "Errors in tests are caught and reported properly"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.5 - TRT Framework Foundation"
+    },
+    {
+      "id": "US-0.5.2",
+      "title": "Essential Assertions",
+      "description": "Implement basic assertion functions for T-Lisp testing: assert-true, assert-false, assert-equal, assert-not-equal, assert-error.",
+      "acceptanceCriteria": [
+        "(assert-true value) passes when value is truthy",
+        "(assert-false value) passes when value is falsy",
+        "(assert-equal expected actual) passes when values are equal",
+        "(assert-not-equal expected actual) passes when values differ",
+        "Failed assertions show expected vs actual values",
+        "(assert-error form) passes when form raises error"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.5 - Core testing assertions"
+    },
+    {
+      "id": "US-0.5.3",
+      "title": "Basic Test Isolation",
+      "description": "Ensure tests don't interfere with each other by isolating test environments. Variables, buffers, and global state should be reset between tests.",
+      "acceptanceCriteria": [
+        "Variables defined in test A don't exist in test B",
+        "Buffers modified in test A are clean in test B",
+        "Global state changes are restored after test completes",
+        "Failed tests don't affect next test's environment",
+        "(setup) function executes before test runs",
+        "(teardown) function executes after test completes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.5 - Test isolation critical for reliability"
+    },
+    {
+      "id": "US-0.6.1",
+      "title": "Rich Assertions",
+      "description": "Implement advanced assertions for T-Lisp testing: assert-contains, assert-contains-string, assert-matches, assert-type, numeric comparisons.",
+      "acceptanceCriteria": [
+        "(assert-contains list item) checks list membership",
+        "(assert-contains-string haystack needle) checks substring",
+        "(assert-matches pattern string) checks regex match",
+        "(assert-type value 'number) validates type",
+        "(assert->= value expected) and (assert-< value expected) for numeric comparisons",
+        "(assert-in-delta actual tolerance expected) for approximate equality",
+        "Failed assertions show detailed context"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 0.5 - Enhanced testing capabilities"
+    },
+    {
+      "id": "US-0.6.2",
+      "title": "Fixtures System",
+      "description": "Implement fixture system for T-Lisp tests with deffixture, use-fixtures, setup/teardown, and fixture lifecycle management.",
+      "acceptanceCriteria": [
+        "(deffixture my-fixture ...) defines test fixture",
+        "(use-fixtures my-fixture) applies fixture to test",
+        "Fixture cleanup executes after test completes",
+        "Multiple fixtures are set up in order",
+        "Failed fixture setup skips test",
+        "Fixtures can return test data",
+        "Fixture scope controls lifecycle (once, each, all)"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 0.5 - Test data management"
+    },
+    {
+      "id": "US-0.6.3",
+      "title": "Test Suites",
+      "description": "Implement test suite organization with deftest-suite, suite-setup, and suite-teardown for grouping related tests.",
+      "acceptanceCriteria": [
+        "(deftest-suite my-suite ...) defines test suite",
+        "Running suite executes all tests in suite",
+        "(suite-setup) executes once before all tests",
+        "(suite-teardown) executes once after all tests",
+        "Nested suites execute when parent suite runs",
+        "(test-run-suite \"my-suite\") executes only that suite",
+        "Suite descriptions are visible when listing suites"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 0.5 - Test organization"
+    },
+    {
+      "id": "US-0.6.4",
+      "title": "Async Testing",
+      "description": "Implement async test support for T-Lisp with deftest-async, await, async-all, and timeout handling.",
+      "acceptanceCriteria": [
+        "(deftest-async my-async-test (done)) defines async test",
+        "Async test calls (done) when complete",
+        "Async tests timeout after configured duration",
+        "(await promise) continues test when promise resolves",
+        "(async-all tests) waits for all async tests",
+        "Failed async tests show error information",
+        "(assert-eventually condition timeout) polls for condition"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 0.5 - Async testing support"
+    },
+    {
+      "id": "US-0.6.5",
+      "title": "Better CLI Output",
+      "description": "Improve test output formatting with colors, progress indicators, verbose/quiet modes, and summary statistics.",
+      "acceptanceCriteria": [
+        "Passing tests show green checkmarks",
+        "Failing tests show red X with file:line",
+        "Progress indicator shows during test runs",
+        "Summary shows duration and pass/fail counts",
+        "--verbose flag shows detailed output",
+        "--quiet flag shows only summary",
+        "Failing test output appears at end"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 0.5 - Better developer experience"
+    },
+    {
+      "id": "US-0.6.6",
+      "title": "Basic Coverage",
+      "description": "Implement code coverage metrics for T-Lisp tests with percentage coverage, function-level reporting, and coverage thresholds.",
+      "acceptanceCriteria": [
+        "--coverage flag shows coverage percentage",
+        "Coverage report shows which functions are covered",
+        "Untested functions are highlighted in report",
+        "--coverage-format json outputs JSON report",
+        "Coverage report shows which lines need coverage",
+        "Build fails when coverage below threshold"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "Phase 0.5 - Code quality metrics"
+    },
+    {
+      "id": "US-0.8.1",
+      "title": "Basic Server/Client Infrastructure",
+      "description": "Implement server/client architecture with tmax --daemon and tmaxclient command for instant file operations and T-Lisp evaluation.",
+      "acceptanceCriteria": [
+        "tmax --daemon starts server on /tmp/tmax-$UID/server",
+        "tmaxclient file.txt opens file instantly (<100ms)",
+        "tmaxclient --eval '(buffer-list)' returns JSON output",
+        "tmaxclient blocks until buffer closed (wait mode)",
+        "Client exit code 0 if saved, 1 if discarded",
+        "tmaxclient -n file.txt opens in background mode",
+        "tmaxclient shows 'Server not running' error when server not available"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.8 - Server/Client Architecture - AI-native editor foundation"
+    },
+    {
+      "id": "US-0.8.2",
+      "title": "Advanced Client Commands",
+      "description": "Extend tmaxclient with buffer management, stdin insertion, git integration, custom socket paths, and ping command.",
+      "acceptanceCriteria": [
+        "tmaxclient --list-buffers shows all buffers with status",
+        "tmaxclient --kill-buffer scratch.tlisp closes buffer",
+        "echo 'TODO' | tmaxclient --insert-stdin inserts text",
+        "GIT_EDITOR='tmaxclient -nw' enables instant git commits",
+        "tmaxclient -s /tmp/my-project-socket connects to custom socket",
+        "tmaxclient --ping returns 0 if running, 1 if not"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.8 - Advanced client features"
+    },
+    {
+      "id": "US-0.8.3",
+      "title": "AI Agent Control",
+      "description": "Implement JSON-RPC protocol for AI agents to query editor state, execute T-Lisp code, and get help system responses. Enables 10x faster AI workflows.",
+      "acceptanceCriteria": [
+        "query:full-state returns JSON with buffers, cursor, variables, keybindings",
+        "describe-function command returns signature, docs, source, examples",
+        "find-usages command returns all function call locations",
+        "apropos-command command returns matching functions with docs",
+        "T-Lisp code execution + test verification completes in <100ms",
+        "describe-variable command returns value, type, docs, customization"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 0.8 - AI-native editor - key competitive advantage"
+    },
+    {
+      "id": "US-1.1.1",
+      "title": "Word Navigation",
+      "description": "Implement Vim-style word navigation with w (next word start), b (previous word start), e (word end), and count prefix support.",
+      "acceptanceCriteria": [
+        "w moves cursor to start of next word in normal mode",
+        "b moves cursor to start of previous word",
+        "e moves cursor to end of current word",
+        "3w moves cursor forward 3 words",
+        "Word navigation continues to next line at end of line"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.1.2",
+      "title": "Line Navigation",
+      "description": "Implement Vim-style line navigation with 0 (first column), $ (last non-empty), _ (first non-blank), - and + (line motion), and count prefix support.",
+      "acceptanceCriteria": [
+        "0 moves cursor to first column",
+        "$ moves cursor to last non-empty column",
+        "_ moves cursor to first non-blank column",
+        "- moves cursor to first non-blank of previous line",
+        "+ moves cursor to first non-blank of next line",
+        "5- moves cursor up 5 lines"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.2.1",
+      "title": "Delete Operator",
+      "description": "Implement Vim-style delete operator (d) with motion support. d{motion} deletes text and stores in register. Support dd for line deletion and count prefix.",
+      "acceptanceCriteria": [
+        "dw deletes current word",
+        "d$ deletes to end of line",
+        "dd deletes current line",
+        "3dd deletes 3 lines",
+        "d) deletes to end of sentence",
+        "Deleted text stored in default register",
+        "Undo works after delete operations"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.2.2",
+      "title": "Yank (Copy) Operator",
+      "description": "Implement Vim-style yank operator (y) with motion support. y{motion} copies text without deletion. Support yy for line yanking and p/P for pasting.",
+      "acceptanceCriteria": [
+        "yw yanks current word without deleting",
+        "yy yanks entire line",
+        "y$ yanks to end of line",
+        "p pastes after cursor position",
+        "P pastes before cursor position",
+        "Line paste puts text below current line",
+        "Character paste puts text after cursor"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.2.3",
+      "title": "Undo/Redo",
+      "description": "Implement Vim-style undo/redo with u (undo) and Ctrl+r (redo). Track edit history and handle undo branch clearing on new edits.",
+      "acceptanceCriteria": [
+        "u undoes last edit",
+        "Multiple u presses undo edits sequentially",
+        "Ctrl+r redoes undone edits",
+        "u only undoes last edit (not all)",
+        "New edits clear redo history",
+        "Undo to beginning shows 'Already at oldest change'",
+        "Redo to end shows 'Already at newest change'"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.3.1",
+      "title": "Count Prefix",
+      "description": "Implement Vim-style count prefix for commands. Number before command repeats action N times.",
+      "acceptanceCriteria": [
+        "3w moves forward 3 words",
+        "5dd deletes 5 lines",
+        "10x deletes 10 characters",
+        "2yy yanks 2 lines",
+        "3p pastes text 3 times",
+        "0w doesn't move cursor (zero count edge case)"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.4.1",
+      "title": "Change Operator",
+      "description": "Implement Vim-style change operator (c). c{motion} deletes text and enters insert mode. Support cc for line change and count prefix.",
+      "acceptanceCriteria": [
+        "cw deletes word and enters insert mode",
+        "cc clears line and enters insert mode",
+        "c$ deletes to end of line and enters insert mode",
+        "3cw deletes 3 words and enters insert mode",
+        "Esc returns to normal mode with new text",
+        "Deleted text stored in register"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.5.1",
+      "title": "Search Forward/Backward",
+      "description": "Implement Vim-style search with /pattern (forward) and ?pattern (backward). Support n/N for next/previous match and match highlighting.",
+      "acceptanceCriteria": [
+        "/pattern moves cursor to next match",
+        "?pattern moves cursor to previous match",
+        "n moves to next match",
+        "N moves to previous match",
+        "Pattern not found shows error message",
+        "Empty search reuses previous pattern",
+        "Matched text is highlighted"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.5.2",
+      "title": "Word Under Cursor Search",
+      "description": "Implement Vim-style word search with * (next occurrence) and # (previous occurrence) for word under cursor.",
+      "acceptanceCriteria": [
+        "* moves cursor to next occurrence of word under cursor",
+        "# moves cursor to previous occurrence",
+        "n continues in same direction",
+        "N reverses direction",
+        "Only whole word matches (special chars handled)",
+        "Word not found shows error message"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.6.1",
+      "title": "Jump Commands",
+      "description": "Implement Vim-style jump commands for navigating large files. gg (first line), G (last line), Ctrl+f/b (page up/down), Ctrl+d/u (half page).",
+      "acceptanceCriteria": [
+        "gg moves cursor to first line",
+        "G moves cursor to last line",
+        "50G moves cursor to line 50",
+        "Ctrl+f scrolls down one page",
+        "Ctrl+b scrolls up one page",
+        "Ctrl+d scrolls down half page",
+        "Ctrl+u scrolls up half page"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.7.1",
+      "title": "Visual Mode Selection",
+      "description": "Implement Vim-style visual mode with v (character-wise), V (line-wise), Ctrl+v (block-wise). Support text selection and manipulation.",
+      "acceptanceCriteria": [
+        "v enters character-wise visual mode",
+        "V enters line-wise visual mode",
+        "Ctrl+v enters block-wise visual mode",
+        "Cursor movement expands selection",
+        "d deletes selection",
+        "y yanks selection",
+        "u lowercases selection",
+        "U uppercases selection",
+        "Esc exits visual mode and clears selection"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features"
+    },
+    {
+      "id": "US-1.8.1",
+      "title": "Basic Text Objects",
+      "description": "Implement Vim-style text objects for inner/word (iw/aw), inner/around quotes/parens/braces (i\"/a\", i)/a), i{, etc.) for efficient text manipulation.",
+      "acceptanceCriteria": [
+        "diw deletes inner word",
+        "daw deletes word with trailing space",
+        "ci) deletes inside parens and enters insert mode",
+        "ca' deletes including quotes and enters insert mode",
+        "di) deletes inside parentheses",
+        "ci{ deletes inside braces and enters insert mode",
+        "dit deletes inside HTML/XML tag"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Vim superpower"
+    },
+    {
+      "id": "US-1.9.1",
+      "title": "Kill Ring Storage",
+      "description": "Implement Emacs-style kill ring for deleted/yanked text. Store multiple items in ring, rotate through history, and manage ring size.",
+      "acceptanceCriteria": [
+        "Deleted text added to front of kill-ring",
+        "New deletions push older items back",
+        "Ring size limit (default 5) removes oldest when full",
+        "p pastes item from front of kill-ring",
+        "(kill-ring-rotate) rotates ring items",
+        "(kill-ring-list) shows all items"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Emacs integration"
+    },
+    {
+      "id": "US-1.9.2",
+      "title": "Yank Pop",
+      "description": "Implement Emacs-style yank-pop (M-y) to cycle through kill ring history after pasting. Replace pasted text with previous kills.",
+      "acceptanceCriteria": [
+        "M-y after yank replaces with previous kill-ring item",
+        "Repeated M-y cycles through history",
+        "Cycling wraps from end to start",
+        "C-g cancels yank-pop and restores original",
+        "p pastes most recent kill",
+        "p then M-y replaces with second most recent"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Emacs integration"
+    },
+    {
+      "id": "US-1.9.3",
+      "title": "Evil Integration",
+      "description": "Integrate kill ring with Vim's register system. Map unnamed register, yank register (0), delete registers (1-9), named registers (a-z), and system clipboard (+).",
+      "acceptanceCriteria": [
+        "Delete stores in both unnamed register and kill-ring",
+        "Yank stores in register 0",
+        "dd stores in register 1",
+        "9 deletes rotate through registers 1-9",
+        "\"ayw stores in register a",
+        "\"A3w appends to register a",
+        "\"+y stores in system clipboard"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Vim/Emacs bridge"
+    },
+    {
+      "id": "US-1.10.1",
+      "title": "Minibuffer Input",
+      "description": "Implement Emacs-style minibuffer for command input. M-x enters command mode, Tab completes, Enter executes, C-g cancels. Support command history.",
+      "acceptanceCriteria": [
+        "M-x opens minibuffer at bottom of screen",
+        "Typing in minibuffer shows text",
+        "Tab completes or shows options",
+        "Enter executes command",
+        "C-g closes minibuffer without executing",
+        "M-p shows previous input from history",
+        "M-n shows next input from history",
+        "Commands requiring arguments prompt in minibuffer"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Emacs-style UI"
+    },
+    {
+      "id": "US-1.10.2",
+      "title": "Fuzzy Command Completion",
+      "description": "Implement fuzzy completion for minibuffer commands. Match commands by pattern (e.g., 'buf-s' matches 'buffer-save').",
+      "acceptanceCriteria": [
+        "Typing 'buf-s' shows 'buffer-save' completion",
+        "Typing 'bs' completes to 'buffer-save' (fuzzy)",
+        "Multiple matches show list",
+        "Typing with visible list filters matches",
+        "Single match completes fully",
+        "No matches show 'No match' message"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - UX enhancement"
+    },
+    {
+      "id": "US-1.10.3",
+      "title": "Which-key Popup",
+      "description": "Implement which-key popup showing available bindings after typing key prefix. Pause 1 second to show popup.",
+      "acceptanceCriteria": [
+        "C-c (pause) shows all C-c bindings in popup",
+        "Popup shows key and command name for each binding",
+        "Pressing next key updates popup with next-level bindings",
+        "C-g closes popup",
+        "SPC (pause) shows all SPC-prefixed commands",
+        "Quick typing skips which-key (no pause)"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Key discovery"
+    },
+    {
+      "id": "US-1.10.4",
+      "title": "Command Documentation Preview",
+      "description": "Show command documentation in which-key popup or completion list. Display docstring preview for highlighted command.",
+      "acceptanceCriteria": [
+        "Which-key popup shows docs for highlighted command",
+        "Completion shows docstring preview pane",
+        "No documentation shows 'No documentation available'",
+        "Long docs truncated with '...' and show full on demand",
+        "C-h opens full documentation in help buffer"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - UX polish"
+    },
+    {
+      "id": "US-1.11.1",
+      "title": "Describe Key",
+      "description": "Implement C-h k to show what command is bound to a key. Display key, command, and documentation.",
+      "acceptanceCriteria": [
+        "C-h k followed by key shows bound command",
+        "Unbound keys show 'Key is unbound'",
+        "Bound keys show key, command, and documentation",
+        "C-h k C-x C-f shows 'find-file' documentation",
+        "C-g cancels describe-key"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Help system"
+    },
+    {
+      "id": "US-1.11.2",
+      "title": "Describe Function",
+      "description": "Implement C-h f to view function documentation. Prompt for function name in minibuffer and show signature, docstring, and file location.",
+      "acceptanceCriteria": [
+        "C-h f prompts for function name in minibuffer",
+        "Typing 'buffer-save' shows function documentation",
+        "Docs show signature, docstring, and file location",
+        "Function not found shows error message",
+        "q closes help buffer",
+        "Completion shows matching functions while typing"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Help system"
+    },
+    {
+      "id": "US-1.11.3",
+      "title": "Apropos Command",
+      "description": "Implement C-h a to search for commands by pattern. Show all commands matching pattern with their bindings.",
+      "acceptanceCriteria": [
+        "C-h a prompts for search pattern",
+        "Typing 'save' shows all commands with 'save' in name",
+        "Typing 'save.*buffer' shows commands matching both words",
+        "Selecting command shows its documentation",
+        "Results show command name and binding",
+        "No matches show 'No commands found'"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 1 - Core Editing Features - Command discovery"
+    },
+    {
+      "id": "US-2.1.1",
+      "title": "Plugin Directory Structure",
+      "description": "Implement standard plugin directory structure. Plugins in ~/.config/tmax/tlpa/plugin-name/ are discovered on startup. Load plugin.tlisp automatically.",
+      "acceptanceCriteria": [
+        "Plugins in ~/.config/tmax/tlpa/plugin-name/ discovered on startup",
+        "plugin.tlisp loaded automatically",
+        "plugin.toml dependencies loaded first"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 2 - Extensibility & Plugin System"
+    },
+    {
+      "id": "US-2.1.2",
+      "title": "Plugin Lifecycle Hooks",
+      "description": "Implement plugin lifecycle hooks: plugin-init, plugin-enable, plugin-disable, plugin-unload. Execute hooks at appropriate times.",
+      "acceptanceCriteria": [
+        "(plugin-init) executes when plugin loads",
+        "(plugin-enable) executes when plugin enabled",
+        "(plugin-disable) executes cleanup code",
+        "(plugin-unload) frees resources"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Phase 2 - Extensibility & Plugin System"
+    },
+    {
+      "id": "US-2.4.1",
+      "title": "Macro Recording",
+      "description": "Implement Vim-style keyboard macro recording. qa starts recording to register a, q stops recording, @a executes macro.",
+      "acceptanceCriteria": [
+        "qa starts recording for register a",
+        "Commands recorded without executing during recording",
+        "q stops recording and saves to register",
+        "@a executes recorded macro",
+        "@@ executes last macro again"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 2 - Extensibility & Plugin System"
+    },
+    {
+      "id": "US-2.4.2",
+      "title": "Macro Persistence",
+      "description": "Persist keyboard macros across sessions. Save to ~/.config/tmax/macros.tlisp and load on startup.",
+      "acceptanceCriteria": [
+        "Recorded macros persist across tmax restarts",
+        "Editing ~/.config/tmax/macros.tlisp modifies macros",
+        "Edited macros loaded on restart"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 2 - Extensibility & Plugin System"
+    },
+    {
+      "id": "US-3.1.1",
+      "title": "LSP Client Connection",
+      "description": "Connect to Language Server Protocol servers for IDE features. Attempt connection on file open based on file type.",
+      "acceptanceCriteria": [
+        "TypeScript files trigger typescript-language-server connection",
+        "Successful connection shows 'LSP connected' in status line",
+        "Failed connection logs error but keeps editor functional"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 3 - Advanced Features - LSP integration"
+    },
+    {
+      "id": "US-3.1.2",
+      "title": "LSP Diagnostics",
+      "description": "Display LSP diagnostics (errors, warnings) from language server. Show error indicators in gutter and messages in status line.",
+      "acceptanceCriteria": [
+        "Error indicators appear in gutter for diagnostics",
+        "Navigating to error line shows message in status line",
+        "Listing diagnostics shows all errors and warnings"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 3 - Advanced Features - LSP integration"
+    },
+    {
+      "id": "US-3.2.1",
+      "title": "Window Splitting",
+      "description": "Implement Vim-style window splitting. :split splits horizontally, :vsplit splits vertically. C-w w switches focus, C-w q closes window.",
+      "acceptanceCriteria": [
+        ":split splits window horizontally",
+        ":vsplit splits window vertically",
+        "C-w w moves focus to next window",
+        "C-w q closes current window"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 3 - Advanced Features - Multi-window editing"
+    },
+    {
+      "id": "US-3.2.2",
+      "title": "Window Resizing",
+      "description": "Implement Vim-style window resizing. C-w +/- resize height, C-w </> resize width.",
+      "acceptanceCriteria": [
+        "C-w + increases current window height",
+        "C-w - decreases current window height",
+        "C-w > increases current window width",
+        "C-w < decreases current window width"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "Phase 3 - Advanced Features - Multi-window editing"
+    },
+    {
+      "id": "US-3.4.1",
+      "title": "Undo Tree",
+      "description": "Implement branching undo tree for exploring alternative edit histories. Visualize branches and allow branch selection.",
+      "acceptanceCriteria": [
+        "Edits A, B, C, undo to A, then D shows branch: A→B→C and A→D",
+        "Navigating to branch point allows branch selection",
+        "Undo tree visualization shows branches"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "Phase 3 - Advanced Features - Enhanced undo"
+    },
+    {
+      "id": "US-4.1.1",
+      "title": "Plugin Repository",
+      "description": "Implement central plugin repository for discovery. M-x plugin-list shows available plugins with install commands.",
+      "acceptanceCriteria": [
+        "M-x plugin-list shows available plugins",
+        "Selecting plugin shows description, author, install command",
+        "Installing downloads to ~/.config/tmax/tlpa/"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "Phase 4 - Community & Ecosystem"
+    },
+    {
+      "id": "US-4.1.2",
+      "title": "Plugin Submission",
+      "description": "Implement plugin submission process for sharing plugins. Review process and publication to repository.",
+      "acceptanceCriteria": [
+        "Plugin submission triggers review process",
+        "Approved plugins published to repository",
+        "Published plugins appear in plugin-list results"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "Phase 4 - Community & Ecosystem"
+    },
+    {
+      "id": "US-4.2.1",
+      "title": "Documentation Website",
+      "description": "Create comprehensive online documentation. API reference, tutorials, and guides for T-Lisp functions and editor features.",
+      "acceptanceCriteria": [
+        "Documentation website shows all T-Lisp functions",
+        "Search for 'key bindings' finds tutorials and guides",
+        "Function docs show signature, description, examples, related functions"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "Phase 4 - Community & Ecosystem"
+    },
+    {
+      "id": "US-4.3.1",
+      "title": "Test Coverage Metrics",
+      "description": "Show test coverage metrics for code quality. Percentage coverage per module, line-level coverage reports, CI fail on low coverage.",
+      "acceptanceCriteria": [
+        "Running tests with coverage shows percentage per module",
+        "Coverage report shows which lines are covered",
+        "CI fails when coverage below threshold"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "Phase 4 - Community & Ecosystem"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2025-02-03",
+    "updatedAt": "2025-02-03",
+    "updatedFor": "Ralph agent - Key Binding System Refactor",
+    "specType": "feature",
+    "specReference": "specs/prd.md",
+    "totalUserStories": 49,
+    "priorityBreakdown": {
+      "P0 (critical)": 23,
+      "P1 (important)": 21,
+      "P2 (nice-to-have)": 5
+    }
+  }
+}

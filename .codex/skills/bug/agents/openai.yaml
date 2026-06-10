@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bug"
+  short_description: "Plan and resolve bugs with root cause analysis"
+  default_prompt: "Use $bug to plan and fix this bug"

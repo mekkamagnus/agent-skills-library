@@ -1,0 +1,514 @@
+{
+  "projectName": "nerv-ts",
+  "branchName": "ralph/024-voice-capture",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Single-Channel Capture",
+      "description": "User can capture thoughts by posting messages to a single, private Slack channel",
+      "acceptanceCriteria": [
+        "Bot monitors configured Slack channel",
+        "All user messages are captured",
+        "Bot messages are ignored",
+        "Thread replies are captured for corrections"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "From SPEC-001"
+    },
+    {
+      "id": "US-002",
+      "title": "Zero-Decision Capture",
+      "description": "User can capture raw thoughts without any formatting, categorization, or metadata",
+      "acceptanceCriteria": [
+        "Plain text messages are accepted",
+        "No special syntax required",
+        "No metadata needed from user",
+        "AI handles all classification"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "From SPEC-001"
+    },
+    {
+      "id": "US-003",
+      "title": "Automatic Categorization",
+      "description": "System automatically categorizes captured thoughts into people, projects, ideas, or admin",
+      "acceptanceCriteria": [
+        "AI classifies each message",
+        "Categories: people, projects, ideas, admin",
+        "Classification happens within 10 seconds",
+        "Confidence score assigned"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "From SPEC-001"
+    },
+    {
+      "id": "US-004",
+      "title": "Field Extraction",
+      "description": "System extracts type-specific fields from each captured thought",
+      "acceptanceCriteria": [
+        "People: name, context, follow-ups",
+        "Projects: name, status, next action, notes",
+        "Ideas: title, oneliner, notes",
+        "Admin: name, due date, status"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "From SPEC-001"
+    },
+    {
+      "id": "US-005",
+      "title": "Confidence Scoring",
+      "description": "AI provides confidence score for each classification",
+      "acceptanceCriteria": [
+        "Scores range from 0.0 to 1.0",
+        "Low confidence triggers review flow",
+        "Threshold configurable",
+        "Score displayed in confirmation"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "From SPEC-001"
+    },
+    {
+      "id": "US-006",
+      "title": "Audit Log System",
+      "description": "Create comprehensive JSON audit log tracking all captured thoughts with UUID, timestamps, classification results, and status",
+      "acceptanceCriteria": [
+        "All entries have unique UUID and ISO-8601 timestamp",
+        "Schema includes: original_text, destination, title, confidence, fields, status, model",
+        "Support filtering by date range, category, and status",
+        "Atomic append operations to prevent data loss",
+        "Support correction updates with full audit trail"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "P0 - From SPEC-002"
+    },
+    {
+      "id": "US-007",
+      "title": "Filing Confirmation",
+      "description": "Send Slack thread reply after filing with checkmark emoji, destination, title, confidence score, and correction instructions",
+      "acceptanceCriteria": [
+        "Reply posted in thread within 5 seconds of filing",
+        "Message includes: ✅ emoji, category, title, confidence score",
+        "Includes instructions: 'Reply 'fix: <correction>' if wrong'",
+        "Low-confidence items handled differently (see US-008)",
+        "Removes current captured_thoughts.jsonl logic"
+      ],
+      "priority": 7,
+      "passes": true,
+      "notes": "P0 - From SPEC-002"
+    },
+    {
+      "id": "US-008",
+      "title": "Low-Confidence Handling",
+      "description": "DM user for clarification when classification confidence is below threshold instead of filing",
+      "acceptanceCriteria": [
+        "Configurable confidence threshold (default: 0.7)",
+        "Low-confidence items NOT written to category files",
+        "Logged to audit with status='needs_review'",
+        "DM sent to user with original message, confidence score, and clarification request",
+        "DM includes examples of how to repost with hints"
+      ],
+      "priority": 8,
+      "passes": true,
+      "notes": "P1 - From SPEC-002"
+    },
+    {
+      "id": "US-009",
+      "title": "One-Step Corrections",
+      "description": "Parse and apply 'fix:' commands from thread replies to correct categorization, title, or other fields",
+      "acceptanceCriteria": [
+        "Supports: 'fix: this should be people, not projects'",
+        "Supports: 'fix: move to ideas'",
+        "Supports: 'fix: change title to \"Better title\"'",
+        "Removes entry from old category file",
+        "Adds entry to new category file",
+        "Updates audit log with correction details",
+        "Updates timeline links",
+        "Posts confirmation in thread"
+      ],
+      "priority": 9,
+      "passes": true,
+      "notes": "P1 - From SPEC-002"
+    },
+    {
+      "id": "US-010",
+      "title": "Error Recovery",
+      "description": "Implement retry logic, exponential backoff, and user notifications for LLM API failures, markdown write failures, and Slack API failures",
+      "acceptanceCriteria": [
+        "LLM API Failure: Preserve in audit log, notify user, retry with backoff (max 3)",
+        "Markdown Write Failure: Preserve classification in audit, notify with error, offer retry",
+        "Slack API Failure: Still write to markdown and log, continue processing",
+        "After 3 LLM failures, ask user to manually categorize via Slack DM",
+        "After markdown write failure, offer interactive recovery with yes/no prompt",
+        "All errors logged with full context"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - Parent story - Child stories: US-017, US-018. Error recovery flows implemented."
+    },
+    {
+      "id": "US-017",
+      "title": "Manual Categorization After LLM Failures",
+      "description": "After 3 failed LLM classification attempts, prompt user to manually categorize via Slack DM with category prefixes (person:, project:, idea:, admin:)",
+      "acceptanceCriteria": [
+        "After 3 LLM retry failures, send DM requesting manual categorization",
+        "User can reply with category prefix: 'person:', 'project:', 'idea:', 'admin:'",
+        "Bot processes manual categorization and files entry normally",
+        "Original message preserved in audit log",
+        "User receives confirmation when manual categorization complete",
+        "Audit log tracks manual categorization flow"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - From SPEC-010-manual-categorization-recovery.md - Part of US-010"
+    },
+    {
+      "id": "US-018",
+      "title": "Interactive Recovery for Markdown Write Failures",
+      "description": "When markdown write fails, offer interactive recovery mode with 'Would you like me to retry? (yes/no)' prompt",
+      "acceptanceCriteria": [
+        "After markdown write fails, send DM with error details",
+        "Offer recovery mode: 'Would you like me to retry? (yes/no)'",
+        "If user responds 'yes', retry with exponential backoff (max 3 attempts)",
+        "If user responds 'no' or timeout, preserve data in audit log with status='error'",
+        "Classification data never lost (always in audit log)",
+        "Processing continues for other messages"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - From SPEC-011-interactive-recovery.md - Part of US-010"
+    },
+    {
+      "id": "US-019",
+      "title": "Daily Summary Generation",
+      "description": "Automatically generate end-of-day summary via LLM at midnight in user's timezone and add to daily timeline file",
+      "acceptanceCriteria": [
+        "Daily file is created at timeline/yyyy-mm-dd.md when first note captured",
+        "Each subsequent note appended to daily file throughout the day",
+        "At end of day (midnight), LLM generates 2-3 sentence summary",
+        "Summary based on all notes created that day",
+        "Summary added to daily file frontmatter and as content section",
+        "Process automated via cron job running daily at midnight"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - From SPEC-012-daily-summary-generation.md - Part of US-016"
+    },
+    {
+      "id": "US-020",
+      "title": "Weekly Review Content to Timeline Files",
+      "description": "Write weekly review content (highlights, open loops, suggested actions) to weekly timeline file",
+      "acceptanceCriteria": [
+        "Weekly file created/updated at timeline/yyyy-W##.md when weekly review runs",
+        "Full weekly review content included (from Slack digest)",
+        "Review includes: what happened, biggest open loops, 3 suggested actions",
+        "Links to all 7 daily notes for that week",
+        "Aggregated statistics and patterns",
+        "File format matches Weekly Note Schema from PRD"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - From SPEC-013-weekly-review-content.md - Part of US-016"
+    },
+    {
+      "id": "US-021",
+      "title": "Monthly Review Content to Timeline Files",
+      "description": "Write monthly review content with trends and patterns to monthly timeline file",
+      "acceptanceCriteria": [
+        "Monthly file created/updated at timeline/yyyy-mm.md when monthly review runs",
+        "Monthly review includes trends and patterns",
+        "Links to all weekly notes for that month",
+        "Aggregated statistics (total notes, most active day, category breakdown)",
+        "Top accomplishments and goals for next month",
+        "File format matches Monthly Note Schema from PRD"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - From SPEC-014-monthly-review-content.md - Part of US-016"
+    },
+    {
+      "id": "US-022",
+      "title": "Quarterly Review Content to Timeline Files",
+      "description": "Write quarterly strategic review with themes and questions to quarterly timeline file",
+      "acceptanceCriteria": [
+        "Quarterly file created/updated at timeline/yyyy-Q#.md when quarterly review runs",
+        "Quarterly file includes strategic review with themes and questions",
+        "Links to all monthly notes for that quarter",
+        "Top 5 projects by impact (accomplishments, progress)",
+        "Goals for next quarter based on current quarter's learnings",
+        "File format matches Quarterly Note Schema from PRD"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - From SPEC-015-quarterly-review-content.md - Part of US-016"
+    },
+    {
+      "id": "US-023",
+      "title": "Yearly Review Content to Timeline Files",
+      "description": "Write comprehensive annual review with productivity metrics to yearly timeline file",
+      "acceptanceCriteria": [
+        "Yearly file created/updated at timeline/yyyy.md when yearly review runs",
+        "Yearly file includes comprehensive annual review",
+        "Links to all quarterly notes for that year",
+        "Top 10 completed projects by impact",
+        "Productivity metrics (capture consistency, system health)",
+        "Annual highlights and accomplishments",
+        "Goals for next year based on current year's learnings",
+        "File format matches Yearly Note Schema from PRD"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "P1 - From SPEC-016-yearly-review-content.md - Part of US-016"
+    },
+    {
+      "id": "US-011",
+      "title": "Markdown Writer",
+      "description": "Write entries to category markdown files (people.md, projects.md, ideas.md, admin.md) with YAML frontmatter and proper formatting",
+      "acceptanceCriteria": [
+        "Generate YAML frontmatter with all schema fields",
+        "Generate markdown body with headers",
+        "Append to category file with '---' separator",
+        "Use atomic file operations (write to temp, then rename)",
+        "Support removeEntry() for corrections",
+        "Support updateEntry() for in-place corrections",
+        "Entry templates match PRD schema per category"
+      ],
+      "priority": 11,
+      "passes": true,
+      "notes": "P0 - From SPEC-002"
+    },
+    {
+      "id": "US-012",
+      "title": "File Organization",
+      "description": "Create and maintain directory structure for second-brain including category files, audit log, timeline, and archive directories",
+      "acceptanceCriteria": [
+        "Create second-brain/people.md (empty with header)",
+        "Create second-brain/projects.md (empty with header)",
+        "Create second-brain/ideas.md (empty with header)",
+        "Create second-brain/admin.md (empty with header)",
+        "Create second-brain/inbox-log.json (empty array)",
+        "Create second-brain/timeline/ directory",
+        "Create second-brain/archive/ directory",
+        "Create second-brain/README.md explaining structure",
+        "All operations use atomic file operations",
+        "All operations return Result<AppError, T>"
+      ],
+      "priority": 12,
+      "passes": true,
+      "notes": "P0 - From SPEC-002"
+    },
+    {
+      "id": "US-013",
+      "title": "Git Integration",
+      "description": "Automatically commit changes to second-brain with formatted commit messages",
+      "acceptanceCriteria": [
+        "Auto-commit after each entry is filed",
+        "Commit message format: 'File {destination}: {title}'",
+        "Include timestamp in commit message or body",
+        "Stage changed files before commit",
+        "Initialize git repo if not exists",
+        "Check if directory is git repo before operations",
+        "All operations return Result<AppError, T>"
+      ],
+      "priority": 13,
+      "passes": true,
+      "notes": "P2 - From SPEC-002"
+    },
+    {
+      "id": "US-014",
+      "title": "Daily Digest Generation",
+      "description": "Generate daily digest (<150 words) with top 3 actions, one thing to avoid, and one small win",
+      "acceptanceCriteria": [
+        "Query active projects, people with follow-ups, admin due today",
+        "Send to LLM with digest prompt",
+        "Return: Top 3 actions, one thing avoiding, one small win",
+        "Validate word count before returning (<150 words)",
+        "Generated daily at configured time",
+        "Sent via Slack DM to user"
+      ],
+      "priority": 14,
+      "passes": true,
+      "notes": "P1 - From SPEC-002"
+    },
+    {
+      "id": "US-015",
+      "title": "Weekly Review Generation",
+      "description": "Generate weekly review (<250 words) with highlights, open loops, 3 suggested actions, and recurring theme",
+      "acceptanceCriteria": [
+        "Query last 7 days of audit log, active projects, people",
+        "Send to LLM with weekly review prompt",
+        "Return: Highlights, open loops, 3 suggested actions, recurring theme",
+        "Validate word count before returning (<250 words)",
+        "Generated weekly at configured day/time",
+        "Sent via Slack DM to user"
+      ],
+      "priority": 15,
+      "passes": true,
+      "notes": "P1 - From SPEC-002"
+    },
+    {
+      "id": "US-016",
+      "title": "Timeline Management",
+      "description": "Create and maintain daily, weekly, monthly, quarterly, and yearly timeline files with proper linking",
+      "acceptanceCriteria": [
+        "Create timeline/yyyy-mm-dd.md with YAML frontmatter",
+        "Include date, day_of_week, week_number, quarter",
+        "Create timeline/yyyy-W##.md with date range and links to daily notes",
+        "Create timeline/yyyy-mm.md, yyyy-Q#.md, yyyy.md files",
+        "Append notes to daily files",
+        "Link daily → weekly → monthly → quarterly → yearly",
+        "Generate end-of-day summary via LLM and add to daily file",
+        "Write weekly review content to weekly timeline file",
+        "Write monthly review content with trends and patterns",
+        "Write quarterly strategic review with themes and questions",
+        "Write yearly comprehensive review with productivity metrics",
+        "Use date-fns for date calculations",
+        "All operations return Result<AppError, T>"
+      ],
+      "priority": 16,
+      "passes": true,
+      "notes": "P1 - Parent story - Child stories: US-019, US-020, US-021, US-022, US-023. 100% complete - All AI summaries and reviews implemented (US-019 through US-023)"
+    },
+    {
+      "id": "US-017",
+      "title": "Cross-Linking",
+      "description": "Create bidirectional links between category files and timeline files",
+      "acceptanceCriteria": [
+        "Generate heading IDs by slugifying titles for anchors",
+        "Link in daily file: [title](../category.md#heading)",
+        "Link in category file: Captured: [date](timeline/yyyy-mm-dd.md)",
+        "Link timeline hierarchy: day → week → month → quarter → year",
+        "All links use markdown format with relative paths",
+        "All operations return Result<AppError, T>"
+      ],
+      "priority": 17,
+      "passes": true,
+      "notes": "P2 - From SPEC-002"
+    },
+    {
+      "id": "US-018",
+      "title": "Timeline Navigation",
+      "description": "Provide easy navigation between timeline levels and related entries",
+      "acceptanceCriteria": [
+        "Navigate between day, week, month, quarter, year views",
+        "Jump to specific dates from category entries",
+        "View all entries for a time period",
+        "Search within timeline",
+        "Filter timeline by category"
+      ],
+      "priority": 18,
+      "passes": true,
+      "notes": "P2 - From SPEC-002"
+    },
+    {
+      "id": "US-019",
+      "title": "Digest Scheduling",
+      "description": "Schedule daily, weekly, monthly, quarterly, and yearly digest generation with cron",
+      "acceptanceCriteria": [
+        "Schedule daily digest at configurable time",
+        "Schedule weekly review at configurable day and time",
+        "Schedule monthly review (last day of month)",
+        "Schedule quarterly review (last day of quarter)",
+        "Schedule yearly review (December 31)",
+        "Use node-cron for scheduling",
+        "Support stopping all scheduled jobs",
+        "All operations return Result<AppError, T>"
+      ],
+      "priority": 19,
+      "passes": true,
+      "notes": "P1 - From SPEC-002"
+    },
+    {
+      "id": "US-020",
+      "title": "First-Time Setup Wizard",
+      "description": "Interactive setup wizard for initial configuration including Slack tokens, LLM provider, channel, and directory paths",
+      "acceptanceCriteria": [
+        "Prompt for Slack bot token and app token",
+        "Prompt for LLM provider choice (claude, openai, deepseek, local)",
+        "Prompt for LLM API key (if applicable)",
+        "Prompt for Slack channel name",
+        "Prompt for markdown directory path",
+        "Create config file with validated settings",
+        "Initialize directory structure",
+        "Create audit log",
+        "Send test message to verify Slack connection",
+        "Complete setup in <30 minutes",
+        "Use interactive prompts (readline or similar)"
+      ],
+      "priority": 20,
+      "passes": true,
+      "notes": "P2 - From SPEC-002"
+    },
+    {
+      "id": "US-024",
+      "title": "Multi-Provider Voice Capture",
+      "description": "Implement multi-provider voice capture functionality enabling users to dictate voice notes in Slack that are transcribed and processed through the existing classification pipeline. Supports OpenAI Whisper (default), GLM, Google Cloud Speech-to-Text, DeepSeek, and local Whisper.cpp transcription services.",
+      "acceptanceCriteria": [
+        "Audio messages detected in Slack inbox channel",
+        "Files downloaded and validated (format, size limits)",
+        "Transcription via OpenAI Whisper API (default provider)",
+        "Provider switching via configuration (openai, glm, google, deepseek, local)",
+        "Transcribed text classified by existing LLM",
+        "Entries stored with audio metadata in audit log",
+        "Confirmation messages include transcript preview",
+        "Error handling with graceful degradation (inbox_log fallback)",
+        "End-to-end processing < 30s for 1-minute audio",
+        "Zero audio file persistence (privacy)",
+        "Multi-provider transcription client factory implemented",
+        "File downloader service for Slack audio files",
+        "Configuration validation for all providers",
+        "Unit tests for transcription client",
+        "Integration tests for full pipeline"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": "From SPEC-017-voice-capture.md - Multi-provider support with OpenAI Whisper as default. Implements TDD with tests first, then implementation. ~26 hours over 6 phases."
+    },
+    {
+      "id": "US-023",
+      "title": "Natural Language Search",
+      "description": "Search across all category files using natural language queries",
+      "acceptanceCriteria": [
+        "Parse natural language query",
+        "Search across all category files",
+        "Rank results by relevance",
+        "Return matching entries with context",
+        "Support queries like: 'What did I say about Sarah?'",
+        "Support queries like: 'Active projects related to website'",
+        "Support queries like: 'Ideas from last week'"
+      ],
+      "priority": 23,
+      "passes": true,
+      "notes": "P2 - From SPEC-002"
+    },
+    {
+      "id": "US-025",
+      "title": "Fix Search Command Conflict",
+      "description": "Change search command prefix from 'search:' to '!search' to avoid conflicts with Slack's slash command system which uses '/' prefix",
+      "acceptanceCriteria": [
+        "Update src/bot.ts to use '!search' prefix instead of 'search:'",
+        "Update README.md examples to show '!search' command",
+        "Update prd.md documentation to use '!search' syntax",
+        "Update specs/SPEC-003-complete-remaining-stories.md to use '!search'",
+        "Update src/AGENTS.md to reflect new command syntax",
+        "Ensure all references to 'search:' are replaced with '!search'",
+        "Run typecheck to verify no TypeScript errors",
+        "Run full test suite to ensure no regressions"
+      ],
+      "priority": 25,
+      "passes": true,
+      "notes": "From SPEC-009-fix-search-command.md - Fixes GitHub issue #1"
+    }
+  ],
+  "metadata": {
+    "specFile": "specs/SPEC-009-fix-search-command.md",
+    "specType": "chore",
+    "createdAt": "2026-01-26",
+    "updatedFor": "Search Command Fix"
+  }
+}

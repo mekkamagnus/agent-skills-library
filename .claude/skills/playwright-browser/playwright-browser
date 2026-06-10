@@ -1,0 +1,28 @@
+#!/usr/bin/env bun
+/**
+ * Playwright Browser Control Script (Wrapper)
+ * Usage: ./playwright-browser [action] [args...]
+ */
+
+import { spawn } from 'node:child_process';
+import { stderr } from 'node:process';
+
+const SCRIPT_PATH = '/Users/mekael/.claude/skills/playwright-browser/playwright-browser.ts';
+
+async function runScript(args: string[]) {
+  const process = spawn('bun', [SCRIPT_PATH, ...args], {
+    stdio: 'inherit',
+  });
+
+  process.on('close', (code) => {
+    process.exit(code ?? 0);
+  });
+
+  process.on('error', (err) => {
+    console.error('Failed to start script:', err);
+    process.exit(1);
+  });
+}
+
+const args = process.argv.slice(2);
+runScript(args);
